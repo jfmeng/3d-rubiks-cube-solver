@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>魔方复原实验室｜离线截图识别版</title>
+<style>
+:root{--bg:#07111f;--panel:rgba(14,29,49,.88);--line:#263f5b;--text:#eaf4ff;--muted:#8ba7c3;--cyan:#4ed7ff;--green:#56e39f;--orange:#ffba63;--red:#ff6b79}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% -10%,#183b5c 0,#07111f 45%,#040a12 100%);color:var(--text);font-family:"Microsoft YaHei",system-ui,sans-serif}body{padding:28px 20px 40px}.app{max-width:1400px;margin:auto}.topbar{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;margin-bottom:22px}.eyebrow{font-size:12px;letter-spacing:.18em;color:var(--cyan);font-weight:700}.brand{font-size:30px;font-weight:800;letter-spacing:.04em;margin-top:6px}.subtitle{color:var(--muted);font-size:14px;margin-top:8px}.status{border:1px solid #2d526e;background:rgba(6,19,33,.7);border-radius:14px;padding:12px 16px;min-width:210px}.status b{color:var(--green)}.status small{display:block;color:var(--muted);margin-top:5px}.layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(370px,.8fr);gap:20px}.panel{background:linear-gradient(145deg,rgba(19,39,63,.9),rgba(8,20,36,.95));border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 55px rgba(0,0,0,.24);overflow:hidden}.panel-head{display:flex;justify-content:space-between;align-items:center;padding:17px 20px;border-bottom:1px solid rgba(83,133,171,.22)}.panel-title{font-size:16px;font-weight:800}.panel-note{font-size:12px;color:var(--muted)}.viewer{min-height:510px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle at 50% 43%,rgba(64,168,216,.16),transparent 35%)}.viewer:after{content:"";position:absolute;width:370px;height:85px;bottom:57px;border-radius:50%;background:rgba(0,0,0,.38);filter:blur(23px)}.scene{width:390px;height:390px;perspective:920px;position:relative;z-index:1}.cube{width:230px;height:230px;position:absolute;left:80px;top:70px;transform-style:preserve-3d;transform:rotateX(-19deg) rotateY(-35deg) rotateZ(0deg);transition:transform .32s cubic-bezier(.2,.8,.2,1)}.face{position:absolute;width:230px;height:230px;padding:7px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:5px;background:#050a10;border:2px solid #050a10;border-radius:7px;backface-visibility:hidden}.face.u{transform:rotateX(90deg) translateZ(115px)}.face.r{transform:rotateY(90deg) translateZ(115px)}.face.f{transform:translateZ(115px)}.face.d{transform:rotateX(-90deg) translateZ(115px)}.face.l{transform:rotateY(-90deg) translateZ(115px)}.face.b{transform:rotateY(180deg) translateZ(115px)}.sticker{border-radius:4px;border:1px solid rgba(0,0,0,.28);box-shadow:inset 0 0 9px rgba(255,255,255,.18),0 1px 2px #000;transition:background .2s,filter .2s}.sticker.flash{filter:brightness(1.8) saturate(1.35)}.drag-tip{position:absolute;bottom:18px;z-index:2;color:var(--muted);font-size:12px;background:rgba(5,15,26,.68);padding:7px 12px;border-radius:99px}.viewer-tools{position:absolute;right:17px;top:16px;z-index:3;display:flex;gap:7px}.btn{appearance:none;border:1px solid #315876;background:#102b44;color:var(--text);padding:9px 13px;border-radius:9px;cursor:pointer;font-weight:700;font-family:inherit;transition:.18s}.btn:hover{border-color:var(--cyan);background:#153b58;transform:translateY(-1px)}.btn.primary{background:linear-gradient(135deg,#2c91bc,#2269ad);border-color:#65ddff}.btn.success{background:linear-gradient(135deg,#228c75,#197362);border-color:#6ee4b5}.btn.ghost{background:transparent}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}.right{display:flex;flex-direction:column;gap:20px}.entry{padding:17px 20px 20px}.helper{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 14px}.net{display:grid;grid-template-columns:repeat(4,62px);grid-template-rows:repeat(3,62px);gap:9px;justify-content:center;margin:12px 0 16px}.face-input{width:62px;height:62px;border:1px solid #315471;border-radius:9px;background:rgba(6,15,27,.65);padding:5px;display:grid;grid-template-columns:repeat(3,1fr);gap:2px}.face-input.u{grid-column:2;grid-row:1}.face-input.l{grid-column:1;grid-row:2}.face-input.f{grid-column:2;grid-row:2}.face-input.r{grid-column:3;grid-row:2}.face-input.b{grid-column:4;grid-row:2}.face-input.d{grid-column:2;grid-row:3}.face-label{position:absolute;transform:translateY(-20px);font-size:10px;color:#a7c8e4}.input-cell{border-radius:2px;cursor:pointer;border:1px solid rgba(0,0,0,.28)}.input-cell.center{outline:1px solid rgba(255,255,255,.68);outline-offset:-2px;cursor:default}.palette{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.palette-label{font-size:12px;color:var(--muted);margin-right:2px}.color-btn{width:26px;height:26px;border-radius:7px;border:2px solid transparent;cursor:pointer;box-shadow:0 2px 4px #0008}.color-btn.active{border-color:#fff;box-shadow:0 0 0 2px var(--cyan),0 2px 5px #000}.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.divider{height:1px;background:#203a53;margin:17px 0}.solve-box{padding:17px 20px 20px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metric{background:rgba(5,15,27,.58);border:1px solid #203c55;border-radius:10px;padding:11px}.metric small{display:block;color:var(--muted);font-size:11px}.metric b{display:block;margin-top:5px;font-size:20px;color:var(--cyan)}.moves{margin-top:14px;min-height:78px;line-height:1.9;color:#bcecff;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-word}.moves .move{display:inline-block;padding:2px 8px;margin:3px 3px 0 0;border-radius:6px;background:#133b55;border:1px solid #27637e}.moves .move.done{background:#1a5c4c;border-color:#4ecfa2;color:#d5fff0}.steps{max-height:165px;overflow:auto;border-top:1px solid #203a53;margin-top:12px;padding-top:10px;color:var(--muted);font-size:12px;line-height:1.7}.step-row{display:flex;gap:9px;padding:4px 0}.step-row.active{color:var(--orange)}.step-no{width:28px;color:#6c94b4}.notice{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6}.notice strong{color:var(--orange)}.toast{position:fixed;left:50%;bottom:23px;z-index:20;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#102b43;border:1px solid #4b7896;padding:11px 17px;border-radius:10px;transition:.2s;box-shadow:0 8px 25px #0008}.toast.show{opacity:1;transform:translate(-50%,0)}@media(max-width:980px){body{padding:18px 12px}.layout{grid-template-columns:1fr}.topbar{display:block}.status{margin-top:14px}.viewer{min-height:450px}}@media(max-width:480px){.brand{font-size:24px}.scene{transform:scale(.82)}.net{transform:scale(.88);margin-left:-8px;margin-right:-8px}.panel-head,.entry,.solve-box{padding-left:14px;padding-right:14px}}
+/* 离线版：放大录入格、真实分层旋转、可访问的表单。 */
+.layout{grid-template-columns:minmax(0,1fr) minmax(460px,1fr)}
+.viewer{min-height:510px}.viewer:after{pointer-events:none}.scene{width:100%;height:470px;perspective:none;touch-action:none;cursor:grab}.scene:active{cursor:grabbing}
+#cubeCanvas{width:100%;height:100%;display:block}.net{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,auto);gap:22px 8px;margin:28px 0 20px;max-width:480px;transform:none}
+.face-input{width:100%;height:auto;aspect-ratio:1;position:relative;padding:4px;gap:3px}.face-label{top:-19px;left:2px;transform:none;font-size:11px;white-space:nowrap}.input-cell{min-width:0;padding:0;color:#101c2b;font-family:inherit;font-size:10px;font-weight:700;touch-action:manipulation}.input-cell:focus-visible{outline:3px solid #4ed7ff}.input-cell:disabled{opacity:1;cursor:default}.input-cell.invalid{outline:2px solid #f16680;outline-offset:-2px}
+.palette{gap:7px}.color-btn{width:auto;min-width:42px;height:32px;font-family:inherit;font-weight:700;color:#111d2b}.validation{padding:10px 12px;border-radius:10px;margin-top:14px;background:#071b29;font-size:13px;line-height:1.7;white-space:pre-line;border:1px solid #33516a}.validation.error{border-color:#e76d7b;color:#ffb6c0}.validation.ok{border-color:#3ec69a;color:#99efcf}.counts{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;font-size:12px}.counts span{padding:3px 6px;border:1px solid #37526b;border-radius:5px}.counts .bad{color:#ff9aaa;border-color:#ff7c89}.steps{max-height:220px}.move{cursor:pointer}.moves .move.current{outline:2px solid #ffc075}.speed-control{font-size:12px;color:#a8c7e0;display:flex;align-items:center;gap:8px;margin-top:15px}input[type=range]{accent-color:#4ed7ff}details{margin-top:15px;font-size:13px;color:#b4c9db;line-height:1.75}summary{cursor:pointer;color:#c6eaff}details ul{padding-left:20px}.readonly-note{font-size:12px;color:#9fbbd3;margin-top:8px}.status{max-width:390px}#statusSub{line-height:1.65}#turnHint{position:absolute;bottom:52px;left:14px;right:14px;z-index:2;text-align:center;font-weight:700;color:#fff1bd}.toast{max-width:90vw}#formulaText{width:100%;min-height:65px;background:#061727;color:#bcdeef;border:1px solid #36526a;padding:8px;border-radius:7px;font-family:monospace;resize:vertical}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.viewer{min-height:440px}.scene{height:420px;transform:none}.entry .net{margin-left:auto;margin-right:auto}.status{max-width:none}}@media(max-width:480px){.viewer{min-height:360px}.scene{height:350px}.brand{font-size:23px}.net{gap:20px 5px}.face-input{gap:2px}.panel-note{font-size:11px}}
+dialog{width:min(1100px,96vw);max-height:94vh;overflow:auto;border:1px solid #527492;border-radius:16px;padding:20px;background:#102035;color:var(--text);box-shadow:0 24px 90px #0009}dialog::backdrop{background:#020914c9}dialog h2{margin:0 0 10px;font-size:20px}.scan-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.scan-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,1fr);gap:20px;margin-top:15px}.scan-preview{min-width:0}.scan-canvas{width:100%;height:auto;display:block;background:#09131e;border:1px solid #3b536a;border-radius:8px;touch-action:none;cursor:crosshair}.scan-face-pick{display:flex;gap:5px;flex-wrap:wrap;margin:10px 0}.scan-face-pick button.active{border-color:#5cf1c1;background:#17614d}.scan-face-pick button.marked{color:#80ebbc}.scan-editor{min-width:0}.scan-editor .net{max-width:390px;gap:22px 5px}.scan-editor .color-btn{min-width:35px}.scan-review{font-size:12px;line-height:1.7;color:#c6d8e9;white-space:pre-line}.scan-cell.uncertain{outline:2px dashed #ff64a1;outline-offset:-2px}.scan-cell{font:700 12px inherit;min-width:0;border:1px solid #18283a;border-radius:3px;padding:0;aspect-ratio:1;cursor:pointer;color:#102034}.scan-footer{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;border-top:1px solid #36516a;margin-top:18px;padding-top:14px}.scan-guide{color:#a7c3dc;font-size:13px;line-height:1.7}.scan-mode{padding:8px 0;color:#8aeac9;font-size:13px}#scanStatus{white-space:pre-line}.scan-toolbar select{color:#dff2ff;background:#173348;border:1px solid #49657d;border-radius:6px;padding:8px}@media(max-width:850px){.scan-layout{grid-template-columns:1fr}dialog{padding:14px}.scan-editor .net{margin-left:auto;margin-right:auto}}
+/* 控制区与魔方放在同一张卡片内，桌面滚动时一起保留在视口中。 */
+.viewer-panel{align-self:start}
+.viewer-controls{padding:15px 20px 18px;border-top:1px solid var(--line);background:rgba(9,25,42,.8)}
+.playback-header{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;font-weight:700}
+#viewerProgress{color:var(--cyan);font-size:13px;font-variant-numeric:tabular-nums}
+.viewer-controls .quick{margin-top:10px;gap:8px}
+.viewer-controls .btn{min-height:42px;padding:10px 16px}
+.viewer-controls .speed-control{flex-wrap:wrap;margin-top:12px}
+.viewer-controls .readonly-note{line-height:1.6;margin-top:8px}
+@media(min-width:1101px){
+  .viewer-panel{position:sticky;top:12px}
+  .viewer-panel .viewer{min-height:clamp(250px,calc(100vh - 415px),510px)}
+  .viewer-panel .scene{height:clamp(230px,calc(100vh - 435px),490px)}
+}
+@media(max-width:480px){.viewer-controls{padding:12px 14px 15px}.viewer-controls .btn{padding:9px 12px}.viewer-controls .speed-control input{max-width:40vw}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div><div class="eyebrow">离线单文件 · 真实分层动画 · 输入合法性校验</div><div class="brand">魔方复原实验室</div><div class="subtitle">输入现实中的贴纸颜色，获得可执行的复原步骤，并用 3D 动画逐步演示。</div></div>
+    <div class="status"><b id="statusText">等待输入</b><small id="statusSub">支持标准三阶魔方 · 本地浏览器运行</small></div>
+  </header>
+  <main class="layout">
+    <section class="panel viewer-panel">
+      <div class="panel-head"><div class="panel-title">3D 复原演示</div><div class="panel-note">拖动查看 · 下方控制播放</div></div>
+      <div class="viewer" id="viewer">
+        <div class="viewer-tools"><button class="btn ghost" id="resetView">重置视角</button><button class="btn" id="randomView">换个角度</button></div>
+        <div class="scene" id="scene"><canvas id="cubeCanvas" aria-label="可拖动旋转的三阶魔方，播放时展示对应层转动"></canvas></div>
+        <div id="turnHint">先录入六面颜色，再校验并计算</div>
+        <div class="drag-tip">拖动旋转视角 · 滚轮缩放 · 面中心标明方向</div>
+      </div>
+      <div class="viewer-controls" id="playbackControls" role="group" aria-label="魔方播放控制">
+        <div class="playback-header"><span>还原播放</span><span id="viewerProgress" aria-live="polite">尚未计算</span></div>
+        <div class="quick"><button class="btn success" id="playBtn" disabled>播放步骤</button><button class="btn" id="prevBtn" disabled>上一步</button><button class="btn" id="nextBtn" disabled>下一步</button><button class="btn ghost" id="restartBtn" disabled>回到起点</button></div>
+        <label class="speed-control">每步动画时长 <input id="speed" type="range" min="150" max="1800" value="700" step="50"> <span id="speedLabel">700 毫秒</span></label>
+        <div class="readonly-note">跟着实物操作时可点“下一步”；暂停会在当前转动结束后停下。</div>
+      </div>
+    </section>
+    <div class="right">
+      <section class="panel"><div class="panel-head"><div class="panel-title">① 输入你的魔方</div><div class="panel-note">先选画笔颜色，再点格子</div></div><div class="entry">
+        <p class="helper">当前持握：<b id="holdingGuide">白色中心朝上、绿色中心朝前、红色中心朝右</b>。展开图每面按从左到右、从上到下录入。导入截图时中心颜色可自动更新。</p>
+        <div class="palette" id="palette"><span class="palette-label">画笔颜色</span></div>
+        <div class="net" id="net"></div>
+        <div class="counts" id="counts" aria-live="polite"></div>
+        <div id="validation" class="validation" role="status">等待校验</div>
+        <div class="quick"><button class="btn primary" id="solveBtn">校验并计算步骤</button><button class="btn ghost" id="cancelBtn" disabled>取消计算</button><button class="btn" id="screenshotBtn">上传截图识别</button><input id="screenshotFile" type="file" accept="image/png,image/jpeg,image/webp" hidden><button class="btn" id="exampleBtn">合法随机打乱</button><button class="btn ghost" id="clearBtn">重置纯色</button></div>
+        <div class="readonly-note" id="entryNote">录入图与 3D 显示同步；进入播放后，录入图保留计算前的原始布局。</div>
+        <details><summary>录入方向与实际操作说明</summary><ul><li>展开图排列为：上；左、前、右、后；下。左右前后面的上边都靠近上面（U）。</li><li>上面的第一行靠后面，最后一行靠前面；下面的第一行靠前面，最后一行靠后面。</li><li>从魔方背后正对后面（B）观察，上面（U）保持朝上；不要镜像抄写。</li><li>还原时按上方“当前持握”固定方向，导入截图后请重新看中心配色。顺时针/逆时针指<strong>正对被转动的那个面</strong>观察。</li><li>R 右、L 左、U 上、D 下、F 前、B 后；无后缀顺时针 90°，撇号 ' 逆时针 90°，2 转 180°。</li><li>上传仅指选择本地文件。图片识别、颜色校验和求解均在本地浏览器执行，不发送至服务器。支持平面展开图，不支持单张实物透视照片自动推断被遮住的面。</li></ul></details>
+      </div></section>
+      <section class="panel"><div class="panel-head"><div class="panel-title">② 复原方案</div><div class="panel-note" id="engineState">等待计算</div></div><div class="solve-box">
+        <div class="metrics"><div class="metric"><small>总步数</small><b id="moveCount">—</b></div><div class="metric"><small>当前步骤</small><b id="currentMove">—</b></div><div class="metric"><small>状态</small><b id="solveState">未开始</b></div></div>
+        <div class="moves" id="moves">先录入贴纸颜色，再点击“计算复原步骤”。</div>
+        <div class="steps" id="steps"><div class="step-row"><span class="step-no">提示</span><span>求解后可逐步播放，也可以按顺序手动执行。</span></div></div>
+        <div class="quick"><button class="btn ghost" id="copyBtn" disabled>复制步骤</button></div>
+        <details><summary>查看或手动复制完整公式</summary><textarea id="formulaText" readonly aria-label="完整还原公式"></textarea></details>
+      </div></section>
+    </div>
+  </main>
+</div><div class="toast" id="toast"></div>
+<dialog id="scanDialog" aria-labelledby="scanTitle">
+<h2 id="scanTitle">上传截图 · 识别六面展开图</h2>
+<p class="scan-guide">适用于你提供的平面方格截图。自动识别后请与原图核对；红色虚线格需要确认。中心颜色也可修改，导入前必须六色各有 9 格、六个中心互不重复。</p>
+<div class="scan-toolbar"><button class="btn primary" id="scanAuto">自动定位六面</button><button class="btn" id="scanManual">逐面框选</button><button class="btn" id="scanRotate">图片顺时针转 90°</button><button class="btn ghost" id="scanReplace">更换图片</button></div>
+<div class="scan-mode" id="scanMode">准备识别</div>
+<div class="scan-layout">
+<div class="scan-preview"><canvas id="scanCanvas" class="scan-canvas" aria-label="原始截图与识别框，手动模式可拖动框选单面"></canvas><div class="scan-face-pick" id="scanFacePick"></div><p class="scan-guide">框选：选择面名，在原图中拖动圈住该面完整的 3×3 外框（不含面名文字）。每面都正对自己读图；后面不要镜像。自动模式适配“上；左前右后；下”的轴对齐展开图。</p></div>
+<div class="scan-editor"><div class="palette" id="scanPalette"><span class="palette-label">校对画笔</span></div><div class="net" id="scanNet"></div><div class="scan-review" id="scanCounts"></div><div class="validation" id="scanStatus" role="status">正在读取文件…</div><div class="scan-toolbar"><select id="scanRotateFace" aria-label="选择需要调整方向的面"><option value="U">上面 U</option><option value="L">左面 L</option><option value="F">前面 F</option><option value="R">右面 R</option><option value="B">后面 B</option><option value="D">下面 D</option></select><button class="btn ghost" id="scanFaceRotate">该面转 90°</button><button class="btn ghost" id="scanConfirmColors">确认全部识别色</button></div><p class="scan-guide">转动单面网格只调整抄图方向；不会转动实际魔方。程序不会为了凑出解法偷偷改色。即使数量正确，导入后仍须通过角块、棱块和奇偶性校验。</p></div>
+</div>
+<div class="scan-footer"><button class="btn ghost" id="scanCancel">取消，保留原布局</button><button class="btn success" id="scanImport" disabled>导入识别结果</button></div>
+</dialog>
+<!-- cubejs 1.3.2, MIT License.
+Copyright (c) 2013-2017 Petri Lehtinen <petri@digip.org>
+Copyright (c) 2018 Ludovic Fernandez
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+<script id="cube-engine">
+(function(){var t,e,r,n,o,i,s,u,h,l,f,c,p,a,v,F,R,m,U,g,D,w,B,y,d,L,b,M,T,S,E,C,O,x,J,N,P,k,z;[U,m,a,o,R,t]=[0,1,2,3,4,5],[b,B,d,D,h,f,s,p]=[0,1,2,3,4,5,6,7],[L,w,y,g,c,u,l,i,F,v,e,r]=[0,1,2,3,4,5,6,7,8,9,10,11],[T,E,O]=(k=function(t){return z(9)+t},N=function(t){return k(9)+t},J=function(t){return N(9)+t},P=function(t){return J(9)+t},x=function(t){return P(9)+t},[[4,13,22,31,40,49],[[(z=function(t){return t-1})(9),k(1),N(3)],[z(7),N(1),P(3)],[z(1),P(1),x(3)],[z(3),x(1),k(3)],[J(3),N(9),k(7)],[J(1),P(9),N(7)],[J(7),x(9),P(7)],[J(9),k(9),x(7)]],[[z(6),k(2)],[z(8),N(2)],[z(4),P(2)],[z(2),x(2)],[J(6),k(8)],[J(2),N(8)],[J(4),P(8)],[J(8),x(8)],[N(6),k(4)],[N(4),P(6)],[x(6),P(4)],[x(4),k(6)]]]),M=["U","R","F","D","L","B"],S=[["U","R","F"],["U","F","L"],["U","L","B"],["U","B","R"],["D","F","R"],["D","L","F"],["D","B","L"],["D","R","B"]],C=[["U","R"],["U","F"],["U","L"],["U","B"],["D","R"],["D","F"],["D","L"],["D","B"],["F","R"],["F","L"],["B","L"],["B","R"]],n=function(){
+var n,T,x,J,N,P,k,z,j,I,$;class q{constructor(t){null!=t?this.init(t):this.identity(),this.newCenter=function(){var t,e;for(e=[],t=0;t<=5;++t)e.push(0);return e}(),this.newCp=function(){var t,e;for(e=[],t=0;t<=7;++t)e.push(0);return e}(),this.newEp=function(){var t,e;for(e=[],t=0;t<=11;++t)e.push(0);return e}(),this.newCo=function(){var t,e;for(e=[],t=0;t<=7;++t)e.push(0);return e}(),this.newEo=function(){var t,e;for(e=[],t=0;t<=11;++t)e.push(0);return e}()}init(t){return this.center=t.center.slice(0),this.co=t.co.slice(0),this.ep=t.ep.slice(0),this.cp=t.cp.slice(0),this.eo=t.eo.slice(0)}identity(){return this.center=[0,1,2,3,4,5],this.cp=[0,1,2,3,4,5,6,7],this.co=function(){var t,e;for(e=[],t=0;t<=7;++t)e.push(0);return e}(),this.ep=[0,1,2,3,4,5,6,7,8,9,10,11],this.eo=function(){var t,e;for(e=[],t=0;t<=11;++t)e.push(0);return e}()}toJSON(){return{center:this.center,cp:this.cp,co:this.co,ep:this.ep,eo:this.eo}}asString(){var t,e,r,n,o,i,s,u,h,l,f;for(f=[],
+r=n=0;n<=5;r=++n)f[9*r+4]=M[this.center[r]];for(r=o=0;o<=7;r=++o)for(t=this.cp[r],h=this.co[r],s=i=0;i<=2;s=++i)f[E[r][(s+h)%3]]=S[t][s];for(r=u=0;u<=11;r=++u)for(e=this.ep[r],h=this.eo[r],s=l=0;l<=1;s=++l)f[O[r][(s+h)%2]]=C[e][s];return f.join("")}static fromString(t){var e,r,n,o,i,s,u,h,l,f,c,p,a,v;for(n=new q,o=s=0;s<=5;o=++s)for(i=u=0;u<=5;i=++u)t[9*o+4]===M[i]&&(n.center[o]=i);for(o=h=0;h<=7;o=++h){for(f=l=0;l<=2&&("U"!==(v=t[E[o][f]])&&"D"!==v);f=++l);for(e=t[E[o][(f+1)%3]],r=t[E[o][(f+2)%3]],i=c=0;c<=7;i=++c)e===S[i][1]&&r===S[i][2]&&(n.cp[o]=i,n.co[o]=f%3)}for(o=p=0;p<=11;o=++p)for(i=a=0;a<=11;i=++a){if(t[O[o][0]]===C[i][0]&&t[O[o][1]]===C[i][1]){n.ep[o]=i,n.eo[o]=0;break}if(t[O[o][0]]===C[i][1]&&t[O[o][1]]===C[i][0]){n.ep[o]=i,n.eo[o]=1;break}}return n}clone(){return new q(this.toJSON())}static random(){return(new q).randomize()}isSolved(){var t,e,r,n,o,i,s;for((r=this.clone()).move(r.upright()),e=o=0;o<=5;e=++o)if(r.center[e]!==e)return!1;for(t=i=0;i<=7;t=++i){
+if(r.cp[t]!==t)return!1;if(0!==r.co[t])return!1}for(n=s=0;s<=11;n=++s){if(r.ep[n]!==n)return!1;if(0!==r.eo[n])return!1}return!0}centerMultiply(t){var e,r,n;for(n=r=0;r<=5;n=++r)e=t.center[n],this.newCenter[n]=this.center[e];return[this.center,this.newCenter]=[this.newCenter,this.center],this}cornerMultiply(t){var e,r,n;for(n=r=0;r<=7;n=++r)e=t.cp[n],this.newCp[n]=this.cp[e],this.newCo[n]=(this.co[e]+t.co[n])%3;return[this.cp,this.newCp]=[this.newCp,this.cp],[this.co,this.newCo]=[this.newCo,this.co],this}edgeMultiply(t){var e,r,n;for(n=r=0;r<=11;n=++r)e=t.ep[n],this.newEp[n]=this.ep[e],this.newEo[n]=(this.eo[e]+t.eo[n])%2;return[this.ep,this.newEp]=[this.newEp,this.ep],[this.eo,this.newEo]=[this.newEo,this.eo],this}multiply(t){return this.centerMultiply(t),this.cornerMultiply(t),this.edgeMultiply(t),this}move(t){var e,r,n,o,i,s,u;for(r=0,o=(s=x(t)).length;r<o;r++)for(e=(i=s[r])/3|0,n=0,u=i%3;0<=u?n<=u:n>=u;0<=u?++n:--n)this.multiply(q.moves[e]);return this}upright(){var e,r,n,i,s,u
+;for(e=this.clone(),u=[],r=i=0;i<=5&&e.center[r]!==a;r=++i);switch(r){case o:u.push("x");break;case U:u.push("x'");break;case t:u.push("x2");break;case m:u.push("y");break;case R:u.push("y'")}for(u.length&&e.move(u[0]),n=s=0;s<=5&&e.center[n]!==U;n=++s);switch(n){case R:u.push("z");break;case m:u.push("z'");break;case o:u.push("z2")}return u.join(" ")}static inverse(t){var e,r,o,i,s,u,h;if(u=function(){var r,n,o,u;for(u=[],r=0,n=(o=x(t)).length;r<n;r++)i=o[r],e=i/3|0,s=i%3,u.push(3*e-(s-1)+1);return u}(),u.reverse(),"string"==typeof t){for(h="",r=0,o=u.length;r<o;r++)i=u[r],s=i%3,h+=n[e=i/3|0],1===s?h+="2":2===s&&(h+="'"),h+=" ";return h.substring(0,h.length-1)}return null!=t.length?u:u[0]}}return q.prototype.randomize=(j=function(t,e){return t+Math.floor(Math.random()*(e-t+1))},$=function(t){var e,r;for(e=t.length;0!==e;)r=j(0,e-1),t[e-=1],[t[e],t[r]]=[t[r],t[e]]},k=function(t){var e,r,n,o,i,s,u;for(i=0,u=function(){var e,r,n;for(n=[],e=0,
+r=t.length-1;0<=r?e<=r:e>=r;0<=r?++e:--e)n.push(!1);return n}();;){for(e=-1,n=o=0,s=t.length-1;0<=s?o<=s:o>=s;n=0<=s?++o:--o)if(!u[n]){e=n;break}if(-1===e)break;for(r=0;!u[e];)u[e]=!0,r++,e=t[e];i+=r+1}return i},J=function(t,e){return(k(e)+k(t))%2==0},P=function(t,e){for($(e),$(t);!J(t,e);)$(e),$(t)},I=function(t,e){var r,n,o;for(r=n=0,o=t.length-1;0<=o?n<=o:n>=o;r=0<=o?++n:--n)t[r]=j(0,e-1)},z=function(t,e){return t.reduce(function(t,e){return t+e})%e===0},N=function(t,e){for(I(t,3);!z(t,3);)I(t,3);for(I(e,2);!z(e,2);)I(e,2)},function(){return P(this.cp,this.ep),N(this.co,this.eo),this}),q.moves=[{center:[0,1,2,3,4,5],cp:[D,b,B,d,h,f,s,p],co:[0,0,0,0,0,0,0,0],ep:[g,L,w,y,c,u,l,i,F,v,e,r],eo:[0,0,0,0,0,0,0,0,0,0,0,0]},{center:[0,1,2,3,4,5],cp:[h,B,d,b,p,f,s,D],co:[2,0,0,1,1,0,0,2],ep:[F,w,y,g,r,u,l,i,c,v,e,L],eo:[0,0,0,0,0,0,0,0,0,0,0,0]},{center:[0,1,2,3,4,5],cp:[B,f,d,D,b,h,s,p],co:[1,2,0,0,2,1,0,0],ep:[L,v,y,g,c,F,l,i,w,u,e,r],eo:[0,1,0,0,0,1,0,0,1,1,0,0]},{center:[0,1,2,3,4,5],
+cp:[b,B,d,D,f,s,p,h],co:[0,0,0,0,0,0,0,0],ep:[L,w,y,g,u,l,i,c,F,v,e,r],eo:[0,0,0,0,0,0,0,0,0,0,0,0]},{center:[0,1,2,3,4,5],cp:[b,d,s,D,h,B,f,p],co:[0,1,2,0,0,2,1,0],ep:[L,w,e,g,c,u,v,i,F,y,l,r],eo:[0,0,0,0,0,0,0,0,0,0,0,0]},{center:[0,1,2,3,4,5],cp:[b,B,D,p,h,f,d,s],co:[0,0,1,2,0,0,2,1],ep:[L,w,y,r,c,u,l,e,F,v,g,i],eo:[0,0,0,1,0,0,0,1,0,0,1,1]},{center:[U,a,R,o,t,m],cp:[b,B,d,D,h,f,s,p],co:[0,0,0,0,0,0,0,0],ep:[L,w,y,g,c,u,l,i,v,e,r,F],eo:[0,0,0,0,0,0,0,0,1,1,1,1]},{center:[t,m,U,a,R,o],cp:[b,B,d,D,h,f,s,p],co:[0,0,0,0,0,0,0,0],ep:[L,g,y,i,c,w,l,u,F,v,e,r],eo:[0,1,0,1,0,1,0,1,0,0,0,0]},{center:[R,U,a,m,o,t],cp:[b,B,d,D,h,f,s,p],co:[0,0,0,0,0,0,0,0],ep:[y,w,l,g,L,u,c,i,F,v,e,r],eo:[1,0,1,0,1,0,1,0,0,0,0,0]}],T={U:0,R:1,F:2,D:3,L:4,B:5,E:6,M:7,S:8,x:9,y:10,z:11,u:12,r:13,f:14,d:15,l:16,b:17},n={0:"U",1:"R",2:"F",3:"D",4:"L",5:"B",6:"E",7:"M",8:"S",9:"x",10:"y",11:"z",12:"u",13:"r",14:"f",15:"d",16:"l",17:"b"},x=function(t){var e,r,n,o,i,s,u;if("string"==typeof t){for(u=[],e=0,
+r=(s=t.split(/\s+/)).length;e<r;e++)if(0!==(o=s[e]).length){if(o.length>2)throw new Error(`Invalid move: ${o}`);if(void 0===(n=T[o[0]]))throw new Error(`Invalid move: ${o}`);if(1===o.length)i=0;else if("2"===o[1])i=1;else{if("'"!==o[1])throw new Error(`Invalid move: ${o}`);i=2}u.push(3*n+i)}return u}return null!=t.length?t:[t]},q.moves.push((new q).move("R M' L'").toJSON()),q.moves.push((new q).move("U E' D'").toJSON()),q.moves.push((new q).move("F S B'").toJSON()),q.moves.push((new q).move("U E'").toJSON()),q.moves.push((new q).move("R M'").toJSON()),q.moves.push((new q).move("F S").toJSON()),q.moves.push((new q).move("D E").toJSON()),q.moves.push((new q).move("L M").toJSON()),q.moves.push((new q).move("B S'").toJSON()),q}.call(this),"undefined"!=typeof module&&null!==module?module.exports=n:this.Cube=n}).call(this),function(){var t,e,r,n,o,i,s,u,h,l,f,c,p,a,v,F,R,m,U,g,D,w,B,y,d,L,b,M,T,S,E,C,O,x,J,N,P,k,z,j,I,$,q,A,G,H,K,Q,V,W,X,Y,Z=[].indexOf
+;for(z in o=this.Cube||require("./cube"),[B,w,v,i,U,t]=[0,1,2,3,4,5],[E,b,T,d,l,c,u,a]=[0,1,2,3,4,5,6,7],[S,L,M,y,p,h,f,s,R,F,e,r]=[0,1,2,3,4,5,6,7,8,9,10,11],n=function(t,e){var r,n,o;if(t<e)return 0;for(e>t/2&&(e=t-e),o=1,r=t,n=1;r!==t-e;)o*=r,o/=n,r--,n++;return o},k=function(t){var e,r,n,o;for(e=1,r=n=2,o=t;2<=o?n<=o:n>=o;r=2<=o?++n:--n)e*=r;return e},j=function(t,e){return t>e?t:e},Q=function(t,e,r){var n,o,i,s,u;for(u=t[e],n=o=i=e,s=r-1;i<=s?o<=s:o>=s;n=i<=s?++o:--o)t[n]=t[n+1];return t[r]=u},V=function(t,e,r){var n,o,i,s,u;for(u=t[r],n=o=i=r,s=e+1;i<=s?o<=s:o>=s;n=i<=s?++o:--o)t[n]=t[n-1];return t[e]=u},G=function(t,e,r,o=!1){var i,s,u,h,l,f;return u=k((h=r-e)+1),"corners"===t?(s=7,f="cp"):(s=11,f="ep"),l=function(){var t,e,r;for(r=[],i=t=0,e=h;0<=e?t<=e:t>=e;i=0<=e?++t:--t)r.push(0);return r}(),function(t){var c,p,a,v,F,R,m,U,g,D,w,B,y,d,L,b,M,T,S,E,C,O,x,J,N,P,k;if(null!=t){for(i=R=0,w=h;0<=w?R<=w:R>=w;i=0<=w?++R:--R)l[i]=i+e;for(p=t%u,c=t/u|0,g=this[f],i=m=0,
+B=s;0<=B?m<=B:m>=B;i=0<=B?++m:--m)g[i]=-1;for(v=U=1,d=h;1<=d?U<=d:U>=d;v=1<=d?++U:--U)for(F=p%(v+1),p=p/(v+1)|0;F>0;)V(l,0,v),F--;if(N=h,o)for(v=D=0,L=s;0<=L?D<=L:D>=L;v=0<=L?++D:--D)c-(a=n(s-v,N+1))>=0&&(g[v]=l[h-N],c-=a,N--);else for(v=O=b=s;b<=0?O<=0:O>=0;v=b<=0?++O:--O)c-(a=n(v,N+1))>=0&&(g[v]=l[N],c-=a,N--);return this}for(g=this[f],i=x=0,M=h;0<=M?x<=M:x>=M;i=0<=M?++x:--x)l[i]=-1;if(c=p=N=0,o)for(v=J=T=s;T<=0?J<=0:J>=0;v=T<=0?++J:--J)e<=(S=g[v])&&S<=r&&(c+=n(s-v,N+1),l[h-N]=g[v],N++);else for(v=P=0,E=s;0<=E?P<=E:P>=E;v=0<=E?++P:--P)e<=(C=g[v])&&C<=r&&(c+=n(v,N+1),l[N]=g[v],N++);for(v=k=y=h;y<=0?k<=0:k>=0;v=y<=0?++k:--k){for(F=0;l[v]!==e+v;)Q(l,0,v),F++;p=(v+1)*p+F}return c*u+p}},m={twist:function(t){var e,r,n,o,i,s;if(null!=t){for(i=0,e=r=6;r>=0;e=--r)o=t%3,t=t/3|0,this.co[e]=o,i+=o;return this.co[7]=(3-i%3)%3,this}for(s=0,e=n=0;n<=6;e=++n)s=3*s+this.co[e];return s},flip:function(t){var e,r,n,o,i,s;if(null!=t){for(i=0,e=r=10;r>=0;e=--r)o=t%2,t=t/2|0,this.eo[e]=o,i+=o
+;return this.eo[11]=(2-i%2)%2,this}for(s=0,e=n=0;n<=10;e=++n)s=2*s+this.eo[e];return s},cornerParity:function(){var t,e,r,n,o,i,s,u,h;for(h=0,t=r=o=a,i=E+1;o<=i?r<=i:r>=i;t=o<=i?++r:--r)for(e=n=s=t-1,u=E;s<=u?n<=u:n>=u;e=s<=u?++n:--n)this.cp[e]>this.cp[t]&&h++;return h%2},edgeParity:function(){var t,e,n,o,i,s,u,h,l;for(l=0,t=n=i=r,s=S+1;i<=s?n<=s:n>=s;t=i<=s?++n:--n)for(e=o=u=t-1,h=S;u<=h?o<=h:o>=h;e=u<=h?++o:--o)this.ep[e]>this.ep[t]&&l++;return l%2},URFtoDLF:G("corners",E,c),URtoUL:G("edges",S,M),UBtoDF:G("edges",y,h),URtoDF:G("edges",S,h),FRtoBR:G("edges",R,r,!0)})W=m[z],o.prototype[z]=W;x=function(t,e,r){var n,i,s,u,h,l,f,c,p,a,v;for(n="corners"===t?"cornerMultiply":"edgeMultiply",i=new o,v=[],s=l=0,a=r-1;0<=a?l<=a:l>=a;s=0<=a?++l:--l){for(i[e](s),u=[],h=c=0;c<=5;h=++c){for(f=o.moves[h],p=0;p<=2;++p)i[n](f),u.push(i[e]());i[n](f)}v.push(u)}return v},X=new o,Y=new o,I=function(t,e){var r,n;for(X.URtoUL(t),Y.UBtoDF(e),r=n=0;n<=7;r=++n)if(-1!==X.ep[r]){if(-1!==Y.ep[r])return-1
+;Y.ep[r]=X.ep[r]}return Y.URtoDF()},g=495,D=24,o.moveTables={parity:[[1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1],[0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0]],twist:null,flip:null,FRtoBR:null,URFtoDLF:null,URtoDF:null,URtoUL:null,UBtoDF:null,mergeURtoDF:null},$={twist:["corners",2187],flip:["edges",2048],FRtoBR:["edges",11880],URFtoDLF:["corners",20160],URtoDF:["edges",20160],URtoUL:["edges",1320],UBtoDF:["edges",1320],mergeURtoDF:[]},o.computeMoveTables=function(...t){var e,r,n,o,i,s;for(0===t.length&&(t=function(){var t;for(n in t=[],$)t.push(n);return t}()),r=0,e=t.length;r<e;r++)s=t[r],null===this.moveTables[s]&&("mergeURtoDF"===s?this.moveTables.mergeURtoDF=function(){var t,e,r,n;for(n=[],e=r=0;r<=335;e=++r)n.push(function(){var r,n;for(n=[],t=r=0;r<=335;t=++r)n.push(I(e,t));return n}());return n}():([o,i]=$[s],this.moveTables[s]=x(o,s,i)));return this},C=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17],q=function(){var t,e,r,n,o,i,s,u;for(u=[],e=r=0;r<=5;e=++r){for(n=[],
+t=o=0;o<=5;t=++o)if(t!==e&&t!==e-3)for(s=i=0;i<=2;s=++i)n.push(3*t+s);u.push(n)}return u}(),O=[0,1,2,4,7,9,10,11,13,16],A=function(){var t,e,r,n,o,i,s,u,h,l;for(l=[],e=n=0;n<=5;e=++n){for(o=[],t=i=0;i<=5;t=++i)if(t!==e&&t!==e-3)for(s=0,r=(h=0===t||3===t?[0,1,2]:[1]).length;s<r;s++)u=h[s],o.push(3*t+u);l.push(o)}return l}(),H=function(t,e,r){var n,o;return o=e>>3,n=e%8<<2,null!=r?(t[o]&=~(15<<n),t[o]|=r<<n,r):(t[o]&15<<n)>>>n},J=function(t,e,r,n){var o,i,s,u,h,l,f,c,p,a,v;for(v=function(){var t,r,n;for(n=[],t=0,r=Math.ceil(e/8)-1;0<=r?t<=r:t>=r;0<=r?++t:--t)n.push(4294967295);return n}(),f=1===t?C:O,H(v,0,i=0),s=1;s!==e;){for(u=l=0,a=e-1;0<=a?l<=a:l>=a;u=0<=a?++l:--l)if(H(v,u)===i)for(o=r(u),p=0,h=f.length;p<h;p++)c=n(o,f[p]),15===H(v,c)&&(H(v,c,i+1),s++);i++}return v},o.pruningTables={sliceTwist:null,sliceFlip:null,sliceURFtoDLFParity:null,sliceURtoDFParity:null},K={sliceTwist:[1,1082565,function(t){return[t%g,t/g|0]},function(t,e){var r,n,i;return[n,i]=t,
+r=o.moveTables.FRtoBR[24*n][e]/24|0,o.moveTables.twist[i][e]*g+r}],sliceFlip:[1,1013760,function(t){return[t%g,t/g|0]},function(t,e){var r,n,i;return[i,r]=t,n=o.moveTables.FRtoBR[24*i][e]/24|0,o.moveTables.flip[r][e]*g+n}],sliceURFtoDLFParity:[2,967680,function(t){return[t%2,(t/2|0)%D,(t/2|0)/D|0]},function(t,e){var r,n,i,s,u;return[s,u,r]=t,n=o.moveTables.parity[s][e],i=o.moveTables.FRtoBR[u][e],2*(o.moveTables.URFtoDLF[r][e]*D+i)+n}],sliceURtoDFParity:[2,967680,function(t){return[t%2,(t/2|0)%D,(t/2|0)/D|0]},function(t,e){var r,n,i,s,u;return[s,u,r]=t,n=o.moveTables.parity[s][e],i=o.moveTables.FRtoBR[u][e],2*(o.moveTables.URtoDF[r][e]*D+i)+n}]},o.computePruningTables=function(...t){var e,r,n,o,i;for(0===t.length&&(t=function(){var t;for(n in t=[],K)t.push(n);return t}()),r=0,e=t.length;r<e;r++)i=t[r],null===this.pruningTables[i]&&(o=K[i],this.pruningTables[i]=J(...o));return this},o.initSolver=function(){return o.computeMoveTables(),o.computePruningTables()},
+o.prototype.solveUpright=function(t=22){var e,r,n,i,s,u,h,l,f;return n=function(){var t,e,r,n,o,i,s;for(e=["U","R","F","D","L","B"],i=["","2","'"],s=[],t=r=0;r<=5;t=++r)for(o=n=0;n<=2;o=++n)s.push(e[t]+i[o]);return s}(),e=class{constructor(t){this.parent=null,this.lastMove=null,this.depth=0,t&&this.init(t)}init(t){return this.flip=t.flip(),this.twist=t.twist(),this.slice=t.FRtoBR()/D|0,this.parity=t.cornerParity(),this.URFtoDLF=t.URFtoDLF(),this.FRtoBR=t.FRtoBR(),this.URtoUL=t.URtoUL(),this.UBtoDF=t.UBtoDF(),this}solution(){return this.parent?this.parent.solution()+n[this.lastMove]+" ":""}move(t,e,r){return o.moveTables[t][e][r]}pruning(t,e){return H(o.pruningTables[t],e)}moves1(){return null!==this.lastMove?q[this.lastMove/3|0]:C}minDist1(){var t,e;return t=this.pruning("sliceFlip",g*this.flip+this.slice),e=this.pruning("sliceTwist",g*this.twist+this.slice),j(t,e)}next1(t){var e;return(e=r.pop()).parent=this,e.lastMove=t,e.depth=this.depth+1,e.flip=this.move("flip",this.flip,t),
+e.twist=this.move("twist",this.twist,t),e.slice=this.move("FRtoBR",24*this.slice,t)/24|0,e}moves2(){return null!==this.lastMove?A[this.lastMove/3|0]:O}minDist2(){var t,e,r,n;return r=2*(D*this.URtoDF+this.FRtoBR)+this.parity,t=this.pruning("sliceURtoDFParity",r),n=2*(D*this.URFtoDLF+this.FRtoBR)+this.parity,e=this.pruning("sliceURFtoDLFParity",n),j(t,e)}init2(t=!0){if(null!==this.parent)return this.parent.init2(!1),this.URFtoDLF=this.move("URFtoDLF",this.parent.URFtoDLF,this.lastMove),this.FRtoBR=this.move("FRtoBR",this.parent.FRtoBR,this.lastMove),this.parity=this.move("parity",this.parent.parity,this.lastMove),this.URtoUL=this.move("URtoUL",this.parent.URtoUL,this.lastMove),this.UBtoDF=this.move("UBtoDF",this.parent.UBtoDF,this.lastMove),t?this.URtoDF=this.move("mergeURtoDF",this.URtoUL,this.UBtoDF):void 0}next2(t){var e;return(e=r.pop()).parent=this,e.lastMove=t,e.depth=this.depth+1,e.URFtoDLF=this.move("URFtoDLF",this.URFtoDLF,t),e.FRtoBR=this.move("FRtoBR",this.FRtoBR,t),
+e.parity=this.move("parity",this.parity,t),e.URtoDF=this.move("URtoDF",this.URtoDF,t),e}},l=null,s=function(e){var r,n,o,s;for(r=0,s=[],r=n=1,o=t;(1<=o?n<=o:n>=o)&&(i(e,r),null===l);r=1<=o?++n:--n)s.push(r++);return s},i=function(t,e){var n,o,s,u,f,c,p;if(0===e){if(0===t.minDist1()&&(null===t.lastMove||(f=t.lastMove,Z.call(O,f)<0)))return h(t)}else if(e>0&&t.minDist1()<=e){for(p=[],o=0,n=(c=t.moves1()).length;o<n&&(s=c[o],u=t.next1(s),i(u,e-1),r.push(u),null===l);o++)p.push(void 0);return p}},h=function(e){var r,n,o,i;for(e.init2(),i=[],r=n=1,o=t-e.depth;(1<=o?n<=o:n>=o)&&(u(e,r),null===l);r=1<=o?++n:--n)i.push(r++);return i},u=function(t,e){var n,o,i,s,h,f;if(0===e){if(0===t.minDist2())return l=t.solution()}else if(e>0&&t.minDist2()<=e){for(f=[],o=0,n=(h=t.moves2()).length;o<n&&(i=h[o],s=t.next2(i),u(s,e-1),r.push(s),null===l);o++)f.push(void 0);return f}},s(f=(r=function(){var r,n,o;for(o=[],r=0,n=t+1;0<=n?r<=n:r>=n;0<=n?++r:--r)o.push(new e);return o}()).pop().init(this)),r.push(f),
+l.length>0&&(l=l.substring(0,l.length-1)),l},P={U:0,R:1,F:2,D:3,L:4,B:5},N={0:"U",1:"R",2:"F",3:"D",4:"L",5:"B"},o.prototype.solve=function(t=22){var e,r,n,i,s,u,h,l;for(l=(e=this.clone()).upright(),e.move(l),u=(new o).move(l).center,h=[],n=0,r=(s=e.solveUpright(t).split(" ")).length;n<r;n++)i=s[n],h.push(N[u[P[i[0]]]]),i.length>1&&(h[h.length-1]+=i[1]);return h.join(" ")},o.scramble=function(){return o.inverse(o.random().solve())}}.call(this);
+</script>
+<script id="cube-core">
+const CubeAppCore = (() => {
+  const faces=['U','R','F','D','L','B'];
+  const centers={U:'W',R:'R',F:'G',D:'Y',L:'O',B:'B'};
+  const names={W:'白',R:'红',G:'绿',Y:'黄',O:'橙',B:'蓝'};
+  const screenshot={U:'YRGWWWYGG',R:'YBWORBGYO',F:'YOOGGWYRR',D:'RGWRYOWYW',L:'RBGYOGBYB',B:'OWRRBOBBB'};
+  const solved=faces.map(f=>f.repeat(9)).join('');
+  const basis={U:[[0,1,0],[1,0,0],[0,0,1]],R:[[1,0,0],[0,0,-1],[0,-1,0]],F:[[0,0,1],[1,0,0],[0,-1,0]],D:[[0,-1,0],[1,0,0],[0,0,-1]],L:[[-1,0,0],[0,0,1],[0,-1,0]],B:[[0,0,-1],[-1,0,0],[0,-1,0]]};
+  const dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0);
+  const add=(a,b)=>a.map((x,i)=>x+b[i]);
+  const mul=(a,k)=>a.map(x=>x*k);
+  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  function rotate(p,n,t){const c=Math.cos(t),s=Math.sin(t);return add(add(mul(p,c),mul(cross(n,p),s)),mul(n,dot(n,p)*(1-c)));}
+  const geometry=[];
+  faces.forEach(f=>{const [n,r,d]=basis[f];for(let i=0;i<9;i++)geometry.push({f,i,n,r,d,p:add(n,add(mul(r,i%3-1),mul(d,Math.floor(i/3)-1)))});});
+  const key=(p,n)=>p.concat(n).map(x=>Math.round(x)||0).join(',');
+  const slots=new Map(geometry.map((g,i)=>[key(g.p,g.n),i]));
+  function move(state,token){
+    if(!/^[URFDLB](2|')?$/.test(token))throw Error('转动记号不正确');
+    const n=basis[token[0]][0],angle=-Math.PI/2*(token.endsWith('2')?2:token.endsWith("'")?-1:1),out=state.split('');
+    geometry.forEach((g,i)=>{if(dot(g.p,n)===1){const j=slots.get(key(rotate(g.p,n,angle),rotate(g.n,n,angle)));out[j]=state[i];}});
+    return out.join('');
+  }
+  function decode(layout){const scheme=Object.fromEntries(faces.map(f=>[layout[f][4],f]));return faces.map(f=>[...layout[f]].map(c=>scheme[c]||'?').join('')).join('');}
+  function encode(state){return Object.fromEntries(faces.map((f,j)=>[f,state.slice(j*9,j*9+9).split('').map(x=>centers[x])]));}
+  function validate(layout){
+    const counts=Object.fromEntries(Object.keys(names).map(c=>[c,0]));
+    for(const f of faces){if(!layout[f]||layout[f].length!==9)throw Error('每面必须录入 9 格');for(const c of layout[f]){if(!(c in counts))throw Error('存在未填写的颜色');counts[c]++;}}
+    if(new Set(faces.map(f=>layout[f][4])).size!==6)throw Error('六个中心必须各不相同，请核对识别结果或面方向。');
+    const bad=Object.keys(counts).filter(c=>counts[c]!==9);
+    if(bad.length)throw Error('颜色数量不正确：'+bad.map(c=>names[c]+'色 '+counts[c]+' 格（应为 9 格）').join('；')+'。请核对实物后改色，程序不会自动猜测。');
+    const state=decode(layout),c=Cube.fromString(state);
+    if(c.asString()!==state||new Set(c.cp).size!==8||new Set(c.ep).size!==12)throw Error('角块或棱块颜色组合错误、重复或缺失。请检查各面的录入方向，尤其是后面和下面。');
+    if(c.co.reduce((a,b)=>a+b,0)%3)throw Error('角块扭转方向不合法：可能录入有误，或某个角块被单独扭转。');
+    if(c.eo.reduce((a,b)=>a+b,0)%2)throw Error('棱块翻转方向不合法：可能录入有误，或某个棱块被单独翻转。');
+    if(c.cornerParity()!==c.edgeParity())throw Error('角块与棱块的交换奇偶性不一致，不能靠正常转动还原。请核对录入或拆装情况。');
+    return state;
+  }
+  return {faces,centers,names,screenshot,solved,basis,geometry,dot,add,mul,rotate,key,slots,move,decode,encode,validate};
+})();
+</script>
+<script id="solver-worker" type="text/plain">
+let initialized=false;
+self.onmessage=function(event){
+  const {state,id}=event.data;
+  try{
+    if(!initialized){postMessage({id,type:'progress',message:'首次使用：正在离线建立求解表…'});Cube.initSolver();initialized=true;}
+    postMessage({id,type:'progress',message:'正在搜索复原步骤…'});
+    const c=Cube.fromString(state),answer=c.isSolved()?'':c.solve(22);
+    if(typeof answer!=='string'||!c.clone().move(answer).isSolved())throw Error('求解结果未通过回放校验');
+    postMessage({id,type:'result',answer});
+  }catch(e){postMessage({id,type:'error',message:'求解器未能完成计算，请重试。'+e.message});}
+};
+</script>
+<script id="net-recognition">
+// 本地像素识别：不使用网络服务；先定位饱和彩色方格，再补采样白格。
+const NetRecognition=(()=>{
+  const slots={U:[1,0],L:[0,1],F:[1,1],R:[2,1],B:[3,1],D:[1,2]};
+  function color(r,g,b){
+    const max=Math.max(r,g,b),min=Math.min(r,g,b),delta=max-min,s=max?delta/max:0;
+    if(max>150&&s<.22)return {color:'W',certain:s<.14&&min>160};
+    if(max<65||s<.32)return {color:'?',certain:false};
+    let h=delta===0?0:max===r?60*((g-b)/delta%6):max===g?60*((b-r)/delta+2):60*((r-g)/delta+4);if(h<0)h+=360;
+    const c=h<13||h>=335?'R':h<43?'O':h<76?'Y':h<172?'G':h<280?'B':'?';
+    const margin=Math.min(...[13,43,76,172,280,335].map(x=>Math.abs(h-x)));
+    return {color:c,certain:c!=='?'&&margin>3&&s>.45&&max>100};
+  }
+  function sample(image,x,y,size){
+    const {data,width:w,height:h}=image,votes={},pixels=[];
+    const radius=Math.max(2,Math.round(size*.2));
+    for(let dy=-radius;dy<=radius;dy+=Math.max(1,Math.floor(radius/4)))for(let dx=-radius;dx<=radius;dx+=Math.max(1,Math.floor(radius/4))){
+      const xx=Math.round(x+dx),yy=Math.round(y+dy);if(xx<0||yy<0||xx>=w||yy>=h)continue;
+      const k=(yy*w+xx)*4;if(data[k+3]<180)continue;
+      const c=color(data[k],data[k+1],data[k+2]);if(c.color!=='?'){votes[c.color]=(votes[c.color]||0)+1;pixels.push(c);}
+    }
+    const sorted=Object.entries(votes).sort((a,b)=>b[1]-a[1]);if(!sorted.length)return {color:'?',certain:false};
+    const winner=sorted[0][0],count=sorted[0][1],certainty=pixels.filter(c=>c.color===winner&&c.certain).length;
+    return {color:winner,certain:count/pixels.length>.8&&certainty/count>.65&&pixels.length>=12};
+  }
+  function fromRect(image,rect){
+    const cells=[];for(let i=0;i<9;i++)cells.push(sample(image,rect.x+(i%3+.5)*rect.w/3,rect.y+(Math.floor(i/3)+.5)*rect.h/3,Math.min(rect.w,rect.h)/3));
+    return cells;
+  }
+  function clusters(values,tolerance){const result=[];for(const v of values.sort((a,b)=>a-b)){const last=result[result.length-1];if(last&&v-last.mean<tolerance){last.sum+=v;last.count++;last.mean=last.sum/last.count;}else result.push({mean:v,sum:v,count:1});}return result;}
+  function median(values){return values.sort((a,b)=>a-b)[Math.floor(values.length/2)];}
+  function locate(image){
+    const {data,width:w,height:h}=image,n=w*h,mask=new Uint8Array(n),queue=new Int32Array(n),components=[];
+    for(let i=0;i<n;i++){const k=i*4,r=data[k],g=data[k+1],b=data[k+2],max=Math.max(r,g,b);if(data[k+3]>180&&max>85&&(max-Math.min(r,g,b))/max>.38)mask[i]=1;}
+    for(let start=0;start<n;start++){
+      if(!mask[start])continue;let head=0,tail=1;queue[0]=start;mask[start]=0;let minx=w,maxx=0,miny=h,maxy=0;
+      while(head<tail){const at=queue[head++],x=at%w,y=(at/w)|0;minx=Math.min(minx,x);maxx=Math.max(maxx,x);miny=Math.min(miny,y);maxy=Math.max(maxy,y);
+        if(x&&mask[at-1]){mask[at-1]=0;queue[tail++]=at-1;}if(x<w-1&&mask[at+1]){mask[at+1]=0;queue[tail++]=at+1;}
+        if(y&&mask[at-w]){mask[at-w]=0;queue[tail++]=at-w;}if(y<h-1&&mask[at+w]){mask[at+w]=0;queue[tail++]=at+w;}
+      }
+      const cw=maxx-minx+1,ch=maxy-miny+1;
+      if(cw>=7&&ch>=7&&cw/w<.25&&ch/h<.4&&cw/ch>.7&&cw/ch<1.4&&tail/(cw*ch)>.65)components.push({x:(minx+maxx)/2,y:(miny+maxy)/2,w:cw,h:ch});
+    }
+    if(components.length<28)throw Error('没有找到足够的独立方格。请使用逐面框选，或上传更清晰的完整展开图。');
+    // 找相同尺寸的重复色块，忽略大面积背景、文字及调色板。
+    const sizes=components.map(c=>(c.w+c.h)/2),tried=new Set();let best=null;
+    for(const size of sizes){
+      const bucket=Math.round(size/3);if(tried.has(bucket))continue;tried.add(bucket);
+      const cells=components.filter(c=>Math.abs(c.w-size)<size*.24&&Math.abs(c.h-size)<size*.24);
+      if(cells.length<28)continue;
+      const rows=clusters(cells.map(c=>c.y),size*.4);
+      for(let first=0;first+8<rows.length;first++){
+        const rr=rows.slice(first,first+9);if(rr.some((r,i)=>i&&(r.mean-rr[i-1].mean<size*.75||r.mean-rr[i-1].mean>size*2.8)))continue;
+        if(rr.slice(3,6).some(r=>r.count<5)||rr.slice(0,3).concat(rr.slice(6)).some(r=>r.count<1||r.count>4))continue;
+        const chosen=cells.filter(c=>rr.some(r=>Math.abs(r.mean-c.y)<size*.4));let cols=clusters(chosen.map(c=>c.x),size*.4);
+        if(cols.length!==12)continue;
+        if(cols.some((c,i)=>i&&(c.mean-cols[i-1].mean<size*.75||c.mean-cols[i-1].mean>size*2.8)))continue;
+        let inside=0,outside=0;
+        chosen.forEach(c=>{const row=rr.findIndex(r=>Math.abs(r.mean-c.y)<size*.4),col=cols.findIndex(r=>Math.abs(r.mean-c.x)<size*.4);if(row>=3&&row<=5||col>=3&&col<=5)inside++;else outside++;});
+        const score=inside-outside*3;if(inside<30||outside>3||best&&score<=best.score)continue;
+        const xs=cols.map(c=>c.mean),ys=rr.map(r=>r.mean),rects={};
+        for(const [f,[gx,gy]] of Object.entries(slots)){const x=xs.slice(gx*3,gx*3+3),y=ys.slice(gy*3,gy*3+3),sx=(x[2]-x[0])/2,sy=(y[2]-y[0])/2;rects[f]={x:x[0]-sx/2,y:y[0]-sy/2,w:3*sx,h:3*sy};}
+        best={score,rects};
+      }
+    }
+    if(!best)throw Error('未能可靠定位标准十字展开图。请点“逐面框选”，分别圈出六个面的完整 3×3 外框。');
+    return best.rects;
+  }
+  return {color,sample,fromRect,locate,slots};
+})();
+</script>
+<script id="cube-app">
+(function(){
+'use strict';
+const core=CubeAppCore,{faces,centers,names,basis,dot,add,mul,rotate}=core;
+const $=id=>document.getElementById(id);
+const colors={W:'#f4f7f5',R:'#ef414c',G:'#13ba7b',Y:'#ffd52f',O:'#ff8c1a',B:'#1969dc'};
+const faceNames={U:'上',R:'右',F:'前',D:'下',L:'左',B:'后'};
+let selected='O',input=core.encode(core.solved),display=core.solved;
+let solution=[],snapshots=[],position=0,playing=false,animating=false,solving=false,playTimer=null;
+let worker=null,job=0,solveTimeout=null,animation=null,drag=null,view={x:.38,y:-.58,zoom:1};
+const canvas=$('cubeCanvas'),ctx=canvas.getContext('2d');
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').classList.remove('show'),3500);}
+function status(title,detail){$('statusText').textContent=title;$('statusSub').textContent=detail;}
+function message(text,type=''){$('validation').textContent=text;$('validation').className='validation '+type;}
+function stop(){playing=false;clearTimeout(playTimer);playTimer=null;syncButtons();}
+function syncButtons(){
+  $('viewerProgress').textContent=solving?'计算中…':snapshots.length?'已执行 '+position+' / '+solution.length+' 步'+(position===solution.length?' · 已还原':playing?' · 播放中':''):'尚未计算';
+  $('solveBtn').disabled=solving||animating;$('cancelBtn').disabled=!solving;
+  for(const id of ['screenshotBtn','exampleBtn','clearBtn'])$(id).disabled=solving||animating;
+  document.querySelectorAll('.input-cell').forEach(b=>b.disabled=solving||animating||b.dataset.i==='4');
+  $('playBtn').disabled=solving||!solution.length||(!playing&&animating);
+  $('playBtn').textContent=playing?'暂停（完成当前步）':position===solution.length&&solution.length?'从原始布局重播':'播放步骤';
+  $('nextBtn').disabled=solving||animating||playing||position>=solution.length;
+  $('prevBtn').disabled=solving||animating||playing||position===0;
+  $('restartBtn').disabled=solving||animating||!snapshots.length;
+  $('copyBtn').disabled=!snapshots.length||solving;
+}
+function clearPlan(){stop();solution=[];snapshots=[];position=0;$('engineState').textContent='尚未计算';$('formulaText').value='';renderSteps();}
+function makeNet(){
+  faces.forEach(f=>{
+    const box=document.createElement('div');box.className='face-input '+f.toLowerCase();
+    const label=document.createElement('span');label.className='face-label';label.textContent=faceNames[f]+' '+f+' · '+names[centers[f]];box.appendChild(label);
+    for(let i=0;i<9;i++){
+      const b=document.createElement('button');b.type='button';b.className='input-cell'+(i===4?' center':'');b.dataset.face=f;b.dataset.i=i;
+      b.onclick=()=>{if(solving||animating||i===4)return;clearPlan();input[f][i]=selected;display=core.decode(input);message('已修改输入，请重新校验并计算。');status('编辑布局','旧步骤已清除，避免误用');$('turnHint').textContent='当前显示录入布局';renderInputs();draw();syncButtons();};
+      box.appendChild(b);
+    }
+    $('net').appendChild(box);
+  });
+  Object.keys(colors).forEach(c=>{const b=document.createElement('button');b.type='button';b.className='color-btn';b.style.background=colors[c];b.textContent=names[c];b.title='选择'+names[c]+'色画笔';b.dataset.color=c;b.onclick=()=>{selected=c;renderPalette();};$('palette').appendChild(b);});
+  renderPalette();
+}
+function renderPalette(){document.querySelectorAll('.color-btn').forEach(b=>{const active=b.dataset.color===selected;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
+function renderInputs(){
+  $('holdingGuide').textContent=names[centers.U]+'色中心朝上、'+names[centers.F]+'色中心朝前、'+names[centers.R]+'色中心朝右';
+  document.querySelectorAll('#net .face-input').forEach((b,i)=>b.querySelector('.face-label').textContent=faceNames[faces[i]]+' '+faces[i]+' · '+names[centers[faces[i]]]);
+  const counts=Object.fromEntries(Object.keys(colors).map(c=>[c,0]));faces.forEach(f=>input[f].forEach(c=>counts[c]++));
+  document.querySelectorAll('.input-cell').forEach(b=>{const f=b.dataset.face,i=+b.dataset.i,c=input[f][i];b.style.background=colors[c];b.textContent=i===4?f:'';b.title=`${faceNames[f]}面第${Math.floor(i/3)+1}行第${i%3+1}列：${names[c]}`;b.setAttribute('aria-label',b.title);b.classList.toggle('invalid',counts[c]>9);});
+  $('counts').innerHTML=Object.keys(colors).map(c=>`<span class="${counts[c]!==9?'bad':''}">${names[c]} ${counts[c]}/9</span>`).join('');
+  $('entryNote').textContent=snapshots.length?'展开图保留计算前的输入；左侧 3D 显示当前还原进度。修改输入将清除方案。':'展开图与 3D 显示同步。中心格固定。';
+}
+function describe(token){return faceNames[token[0]]+'面（'+names[centers[token[0]]]+'色中心）'+(token.endsWith('2')?'转 180°':token.endsWith("'")?'逆时针转 90°':'顺时针转 90°');}
+function renderSteps(){
+  $('moveCount').textContent=snapshots.length?solution.length:'—';$('currentMove').textContent=snapshots.length?position+'/'+solution.length:'—';
+  $('solveState').textContent=solving?'计算中':snapshots.length?(position===solution.length?'已还原':'待执行'):'未计算';
+  $('moves').innerHTML='';$('steps').innerHTML='';
+  if(!snapshots.length){$('moves').textContent='校验通过后，在此生成可以照做的还原步骤。';$('steps').textContent='若颜色或结构不合法，会先说明原因，不会开始无效搜索。';syncButtons();return;}
+  if(!solution.length){$('moves').textContent='当前布局已经还原，无需转动。';$('steps').textContent='六个面均为各自中心颜色。';}
+  solution.forEach((m,i)=>{
+    const b=document.createElement('button');b.className='move'+(i<position?' done':'')+(i===position?' current':'');b.textContent=(i+1)+'. '+m;b.title=describe(m)+'；点击查看完成此步后的状态';b.disabled=solving||animating||playing;
+    b.onclick=()=>{if(solving||animating||playing)return;position=i+1;display=snapshots[position];$('turnHint').textContent='已执行 '+position+' 步';draw();renderSteps();};$('moves').appendChild(b);
+    const row=document.createElement('div');row.className='step-row'+(i===position?' active':'');const n=document.createElement('span');n.className='step-no';n.textContent=String(i+1).padStart(2,'0');const text=document.createElement('span');text.textContent=m+' — '+describe(m)+(i<position?'（已执行）':'');row.append(n,text);$('steps').appendChild(row);
+  });
+  const active=$('steps').querySelector('.active');if(active)$('steps').scrollTop=Math.max(0,active.offsetTop-$('steps').offsetTop-35);
+  syncButtons();
+}
+function load(layout,label){
+  if(solving||animating)return;clearPlan();input=Object.fromEntries(faces.map(f=>[f,[...layout[f]]]));faces.forEach(f=>centers[f]=input[f][4]);display=core.decode(input);renderInputs();draw();$('turnHint').textContent='当前显示：'+label;
+  try{core.validate(input);message('布局通过颜色、角块、棱块与奇偶性校验。可以计算复原步骤。','ok');status(label,'布局合法，尚未计算');}
+  catch(e){message(e.message,'error');status(label,'校验未通过，请核对颜色与方向');}
+  syncButtons();
+}
+function randomize(){let s=core.solved,last='';for(let i=0;i<25;i++){let f;do{f=faces[Math.floor(Math.random()*6)];}while(f===last);last=f;s=core.move(s,f+['',"'",'2'][Math.floor(Math.random()*3)]);}load(core.encode(s),'合法随机打乱');}
+function ensureWorker(){
+  if(worker)return;
+  const source=$('cube-engine').textContent+'\n'+$('solver-worker').textContent;
+  const url=URL.createObjectURL(new Blob([source],{type:'text/javascript'}));
+  try{worker=new Worker(url);}finally{URL.revokeObjectURL(url);}
+  worker.onmessage=e=>{
+    const data=e.data;if(data.id!==job||!solving)return;
+    if(data.type==='progress'){$('engineState').textContent=data.message;status('正在计算',data.message+' 可取消，页面不锁死。');return;}
+    clearTimeout(solveTimeout);solving=false;
+    if(data.type==='error'){clearPlan();message(data.message,'error');status('计算失败','不是颜色校验错误，请重试或重新打开文件。');syncButtons();return;}
+    try{
+      const answer=data.answer.trim();solution=answer?answer.split(/\s+/):[];snapshots=[core.validate(input)];
+      // 用与求解库独立的空间坐标模型逐步复算，确保演示与公式完全一致。
+      for(const token of solution)snapshots.push(core.move(snapshots[snapshots.length-1],token));
+      if(snapshots[snapshots.length-1]!==core.solved)throw Error('步骤未通过独立贴纸回放校验，已拒绝显示');
+      position=0;display=snapshots[0];$('formulaText').value=answer;$('engineState').textContent='离线求解 · 回放校验通过';message('已校验全部步骤：最后六面均恢复中心颜色。','ok');status('方案已验证',solution.length?'共 '+solution.length+' 步；点击下一步或播放。':'当前布局已经还原。');$('turnHint').textContent=solution.length?'下一步：'+describe(solution[0]):'魔方已还原';renderInputs();renderSteps();draw();
+    }catch(e){clearPlan();message(e.message,'error');status('结果校验失败','未输出未经验证的步骤');}
+    syncButtons();
+  };
+  worker.onerror=e=>{if(!solving)return;abort(false);message('离线计算线程运行失败：'+(e.message||'请用独立浏览器打开此 HTML 文件。'),'error');status('计算线程不可用','请用 Edge、Chrome 或 Firefox 打开本地文件。');};
+}
+function solve(){
+  if(solving||animating)return;stop();clearPlan();let state;
+  try{state=core.validate(input);}catch(e){message(e.message,'error');status('输入需要检查','布局未通过校验，未开始求解');renderInputs();return;}
+  if(state===core.solved){snapshots=[state];display=state;message('六面已经还原，无需计算。','ok');status('已经还原','0 步');$('engineState').textContent='无需搜索';$('turnHint').textContent='魔方已还原';renderInputs();renderSteps();draw();return;}
+  try{ensureWorker();solving=true;job++;status('正在计算','首次使用建立离线求解表，随后搜索解法。');message('输入合法。正在后台计算，可以取消。','ok');$('engineState').textContent='准备求解';syncButtons();renderSteps();worker.postMessage({id:job,state});solveTimeout=setTimeout(()=>{abort(false);message('计算超时，已停止后台任务。可以重新计算。','error');status('已停止计算','未将超时误报为输入无解。');},120000);}
+  catch(e){solving=false;syncButtons();message('无法创建计算线程。请下载文件后用独立浏览器打开，不要在受限预览窗口中运行。','error');status('无法启动','文件完整但当前环境限制了后台计算。');}
+}
+function abort(show=true){if(worker){worker.terminate();worker=null;}job++;clearTimeout(solveTimeout);solving=false;clearPlan();if(show){message('已取消，原始输入保留。');status('已取消计算','可修改布局后重新计算。');}syncButtons();}
+function resetPlayback(){if(solving||animating||!snapshots.length)return;stop();position=0;display=snapshots[0];$('turnHint').textContent='回到计算前的原始布局';renderSteps();draw();}
+async function step(direction=1){
+  if(solving||animating||!snapshots.length)return;
+  if(direction===1&&position>=solution.length)return;
+  if(direction===-1&&position===0)return;
+  const token=direction===1?solution[position]:Cube.inverse(solution[position-1]);
+  animating=true;$('turnHint').textContent=(direction===1?'执行：':'撤回：')+token+' — '+describe(token);syncButtons();
+  const duration=Number($('speed').value),axis=basis[token[0]][0],angle=-Math.PI/2*(token.endsWith('2')?2:token.endsWith("'")?-1:1);
+  await new Promise(resolve=>{const start=performance.now();function frame(now){const fraction=Math.min(1,(now-start)/duration),ease=fraction*fraction*(3-2*fraction);animation={axis,angle:angle*ease};draw();if(fraction<1)requestAnimationFrame(frame);else resolve();}requestAnimationFrame(frame);});
+  animation=null;position+=direction;display=snapshots[position];animating=false;
+  if(position===solution.length){playing=false;$('turnHint').textContent='复原完成：六面颜色一致';status('复原完成','可以返回上一步，或从原始打乱布局重播。');}
+  else $('turnHint').textContent='下一步 '+(position+1)+'：'+describe(solution[position]);
+  renderSteps();draw();syncButtons();
+}
+async function playLoop(){if(!playing)return;await step(1);if(playing)playTimer=setTimeout(playLoop,220);}
+function play(){if(playing){stop();return;}if(solving||animating||!solution.length)return;if(position===solution.length)resetPlayback();playing=true;syncButtons();playLoop();}
+async function copy(){const text=solution.map((m,i)=>(i+1)+'. '+m+' — '+describe(m)).join('\n');try{if(!navigator.clipboard)throw Error('clipboard unavailable');await navigator.clipboard.writeText(text||'魔方已还原，无需转动');toast('已复制中文步骤');}catch(e){const t=$('formulaText');t.parentElement.open=true;t.focus();t.select();toast('浏览器未允许自动复制，已展开并选中公式，请手动复制。');}}
+// Canvas 透视渲染：27 个小方块与 54 个贴纸使用同一空间坐标，转动时仅旋转目标层。
+const blacks=[];
+for(let x=-1;x<=1;x++)for(let y=-1;y<=1;y++)for(let z=-1;z<=1;z++){
+  if(x===0&&y===0&&z===0)continue;
+  for(const f of faces){const [n,r,d]=basis[f];blacks.push({p:[x,y,z],n,r,d,center:add([x,y,z],mul(n,.489))});}
+}
+function camera(p){return rotate(rotate(p,[0,1,0],view.y),[1,0,0],view.x);}
+function draw(){
+  const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return;
+  const ratio=Math.min(window.devicePixelRatio||1,2),w=rect.width,h=rect.height;
+  if(canvas.width!==Math.round(w*ratio)||canvas.height!==Math.round(h*ratio)){canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);}
+  ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,w,h);
+  const scale=Math.min(w,h)*.17*view.zoom;
+  function project(p){const k=7/(7-p[2]);return [w/2+p[0]*scale*k,h/2-p[1]*scale*k];}
+  const polys=[];
+  function surface(g,size,color,label){
+    const rotating=animation&&dot(g.p,animation.axis)===1;
+    const transform=p=>camera(rotating?rotate(p,animation.axis,animation.angle):p);
+    const normal=transform(g.n),center=transform(g.center);
+    if(dot(normal,[-center[0],-center[1],7-center[2]])<=0)return;
+    const vertices=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([a,b])=>transform(add(g.center,add(mul(g.r,a*size),mul(g.d,b*size)))));
+    polys.push({vertices,center,normal,color,label});
+  }
+  blacks.forEach(g=>surface(g,.489,'#101923',''));
+  core.geometry.forEach((g,i)=>surface({...g,center:add(g.p,mul(g.n,.502))},.432,colors[centers[display[i]]]||'#777',g.i===4?g.f:''));
+  polys.sort((a,b)=>a.center[2]-b.center[2]);
+  for(const poly of polys){const p=poly.vertices.map(project);ctx.beginPath();ctx.moveTo(...p[0]);for(let j=1;j<4;j++)ctx.lineTo(...p[j]);ctx.closePath();ctx.fillStyle=poly.color;ctx.fill();
+    const shade=Math.max(0,.18*(1-poly.normal[2]));ctx.fillStyle='rgba(0,0,0,'+shade+')';ctx.fill();ctx.strokeStyle='#09131f';ctx.lineWidth=.65;ctx.stroke();
+    if(poly.label){const a=project(poly.center);ctx.fillStyle='#102339';ctx.font='bold '+Math.max(13,Math.min(23,scale*.28))+'px Microsoft YaHei, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(poly.label,a[0],a[1]);}
+  }
+}
+// 图片只在浏览器中读取；识别结果存于草稿，确认前不触碰原魔方与求解步骤。
+const scan={image:null,rects:{},cells:{},brush:'O',manual:false,face:'U',drag:null,loading:false,ticket:0};
+const scanOrder=['U','L','F','R','B','D'],scanCanvas=$('scanCanvas'),scanCtx=scanCanvas.getContext('2d');
+function scanMessage(text,error=false){$('scanStatus').textContent=text;$('scanStatus').className='validation'+(error?' error':'');}
+function scanReady(){return scanOrder.every(f=>scan.cells[f]?.length===9);}
+function scanRender(){
+  const counts=Object.fromEntries(Object.keys(colors).map(c=>[c,0]));let pending=0,unknown=0;
+  document.querySelectorAll('.scan-cell').forEach(b=>{const c=scan.cells[b.dataset.face]?.[+b.dataset.i];b.style.background=colors[c?.color]||'#304459';b.textContent=c?.color&&c.color!=='?'?(+b.dataset.i===4?b.dataset.face:''):'?';b.classList.toggle('uncertain',!!c&&!c.certain);b.title=faceNames[b.dataset.face]+'面第'+(Math.floor(+b.dataset.i/3)+1)+'行第'+(+b.dataset.i%3+1)+'列：'+(names[c?.color]||'未识别');if(c&&c.color in counts)counts[c.color]++;else unknown++;if(c&&!c.certain)pending++;});
+  document.querySelectorAll('#scanFacePick button').forEach(b=>{b.classList.toggle('active',b.dataset.face===scan.face);b.classList.toggle('marked',!!scan.rects[b.dataset.face]);});
+  document.querySelectorAll('#scanPalette button').forEach(b=>{b.classList.toggle('active',b.dataset.color===scan.brush);b.setAttribute('aria-pressed',String(b.dataset.color===scan.brush));});
+  $('scanCounts').textContent=Object.keys(colors).map(c=>names[c]+' '+counts[c]+'/9').join('　')+(pending?'\n待确认 '+pending+' 格':'')+(unknown?'\n尚未识别 '+unknown+' 格':'');
+  const centerList=scanOrder.map(f=>scan.cells[f]?.[4]?.color),centersOK=centerList.every(c=>c in colors)&&new Set(centerList).size===6;
+  $('scanImport').disabled=scan.loading||!scanReady()||unknown>0||pending>0||!centersOK||Object.values(counts).some(c=>c!==9);
+  for(const id of ['scanAuto','scanManual','scanRotate','scanFaceRotate','scanConfirmColors'])$(id).disabled=scan.loading||!scan.image;
+  $('scanMode').textContent=scan.loading?'正在读取本地图片…':scan.manual?'手动框选：当前 '+faceNames[scan.face]+'面 '+scan.face+'，拖动圈住完整 3×3 外框':'自动模式：核对六面识别框与右侧颜色';
+}
+function scanDraw(){
+  if(!scan.image){scanCanvas.width=640;scanCanvas.height=200;scanCtx.clearRect(0,0,640,200);return;}
+  const {width,height}=scan.image;scanCanvas.width=width;scanCanvas.height=height;scanCtx.putImageData(scan.image,0,0);
+  const line=Math.max(2,width/380),font=Math.max(15,width/45);
+  for(const f of scanOrder){const r=scan.rects[f];if(!r)continue;scanCtx.lineWidth=line;scanCtx.strokeStyle=f===scan.face?'#ff45c0':'#04edbd';scanCtx.strokeRect(r.x,r.y,r.w,r.h);
+    scanCtx.fillStyle='#102237';scanCtx.fillRect(r.x+2,r.y+2,font*1.4,font*1.35);scanCtx.fillStyle='#fff';scanCtx.font='bold '+font+'px sans-serif';scanCtx.fillText(f,r.x+font*.2,r.y+font);
+    scanCtx.fillStyle='#ff2faf';for(let i=0;i<9;i++){scanCtx.beginPath();scanCtx.arc(r.x+(i%3+.5)*r.w/3,r.y+(Math.floor(i/3)+.5)*r.h/3,line*1.4,0,Math.PI*2);scanCtx.fill();}
+  }
+  if(scan.drag){const r=scan.drag;scanCtx.strokeStyle='#ffb83f';scanCtx.lineWidth=line;scanCtx.strokeRect(r.x,r.y,r.toX-r.x,r.toY-r.y);}
+}
+function scanCheckMessage(prefix){
+  if(!scanReady()){scanMessage(prefix+' 请继续框选其余面。');return;}
+  const layout=Object.fromEntries(scanOrder.map(f=>[f,scan.cells[f].map(c=>c.color)]));
+  if(Object.values(layout).flat().includes('?')){scanMessage(prefix+' 存在未识别格，请用画笔逐格填色。',true);return;}
+  try{core.validate(layout);scanMessage(prefix+' 颜色及物理结构校验通过。请对照原图确认后导入。');}
+  catch(e){scanMessage(prefix+' '+e.message,true);}
+}
+function scanAuto(){
+  if(!scan.image||scan.loading)return;
+  try{scan.rects=NetRecognition.locate(scan.image);scan.cells={};scanOrder.forEach(f=>scan.cells[f]=NetRecognition.fromRect(scan.image,scan.rects[f]));scan.manual=false;scanCheckMessage('自动识别完成。');}
+  catch(e){scan.manual=true;scanMessage(e.message,true);}
+  scanRender();scanDraw();
+}
+async function readScreenshot(file){
+  if(!file||solving||animating)return;stop();
+  if(!/^image\/(png|jpeg|webp)$/.test(file.type)){toast('请选择 PNG、JPG 或 WebP 图片。');return;}
+  if(file.size>20*1024*1024){toast('图片超过 20 MB，请先压缩或裁剪。');return;}
+  const ticket=++scan.ticket;scan.loading=true;scan.image=null;scan.rects={};scan.cells={};scan.manual=false;scan.face='U';
+  if(!$('scanDialog').open)$('scanDialog').showModal();scanMessage('正在本地读取图片，不会上传至网络。');scanRender();scanDraw();
+  try{
+    const bitmap=await createImageBitmap(file);
+    if(ticket!==scan.ticket){bitmap.close();return;}
+    if(bitmap.width<90||bitmap.height<90||bitmap.width*bitmap.height>45000000){bitmap.close();throw Error('图片过小或像素过大，请使用清晰的展开图截图（至少 90×90，最多 4500 万像素）。');}
+    const scale=Math.min(1,1400/Math.max(bitmap.width,bitmap.height)),c=document.createElement('canvas');c.width=Math.round(bitmap.width*scale);c.height=Math.round(bitmap.height*scale);
+    const x=c.getContext('2d',{willReadFrequently:true});x.fillStyle='#eee';x.fillRect(0,0,c.width,c.height);x.drawImage(bitmap,0,0,c.width,c.height);bitmap.close();scan.image=x.getImageData(0,0,c.width,c.height);scan.loading=false;scanAuto();
+  }catch(e){if(ticket!==scan.ticket)return;scan.loading=false;scanMessage('读取失败：'+e.message,true);scanRender();}
+}
+function scanOpen(){if(solving||animating)return;stop();$('screenshotFile').value='';$('screenshotFile').click();}
+$('screenshotFile').onchange=e=>{const file=e.target.files[0];e.target.value='';readScreenshot(file);};
+$('scanReplace').onclick=scanOpen;$('scanAuto').onclick=scanAuto;
+$('scanManual').onclick=()=>{scan.manual=true;scan.face=scanOrder.find(f=>!scan.cells[f])||'U';scanMessage('选择面名后，拖动圈住该面完整 3×3 外框。后续框选会覆盖该面的草稿颜色。');scanRender();scanDraw();};
+$('scanRotate').onclick=()=>{
+  if(!scan.image)return;const a=document.createElement('canvas'),b=document.createElement('canvas');a.width=scan.image.width;a.height=scan.image.height;a.getContext('2d').putImageData(scan.image,0,0);b.width=a.height;b.height=a.width;const ctx=b.getContext('2d');ctx.translate(b.width,0);ctx.rotate(Math.PI/2);ctx.drawImage(a,0,0);scan.image=ctx.getImageData(0,0,b.width,b.height);scan.rects={};scan.cells={};scanAuto();
+};
+$('scanFaceRotate').onclick=()=>{const f=$('scanRotateFace').value,a=scan.cells[f];if(!a)return;scan.cells[f]=[6,3,0,7,4,1,8,5,2].map(i=>a[i]);scanCheckMessage('已调整 '+f+' 面读图方向。');scanRender();};
+$('scanConfirmColors').onclick=()=>{for(const f of scanOrder)scan.cells[f]?.forEach(c=>{if(c.color in colors)c.certain=true;});scanCheckMessage('已确认识别色。');scanRender();};
+$('scanCancel').onclick=()=>{$('scanDialog').close();};
+$('scanDialog').addEventListener('close',()=>{scan.ticket++;scan.loading=false;scan.drag=null;});
+$('scanImport').onclick=()=>{
+  if($('scanImport').disabled||solving||animating)return;
+  const layout=Object.fromEntries(faces.map(f=>[f,scan.cells[f].map(c=>c.color)]));load(layout,'截图识别结果');$('scanDialog').close();toast('已导入，请核对当前持握方向，再校验并计算。');
+};
+for(const f of scanOrder){
+  const b=document.createElement('button');b.className='btn ghost';b.dataset.face=f;b.textContent=faceNames[f]+' '+f;b.onclick=()=>{scan.face=f;scan.manual=true;scanRender();scanDraw();};$('scanFacePick').appendChild(b);
+  const box=document.createElement('div');box.className='face-input '+f.toLowerCase();const label=document.createElement('span');label.className='face-label';label.textContent=faceNames[f]+' '+f;box.appendChild(label);
+  for(let i=0;i<9;i++){const c=document.createElement('button');c.className='scan-cell';c.dataset.face=f;c.dataset.i=i;c.onclick=()=>{if(scan.loading||!scan.image)return;if(!scan.cells[f])scan.cells[f]=Array.from({length:9},()=>({color:'?',certain:false}));scan.cells[f][i]={color:scan.brush,certain:true};scanCheckMessage('已手动校对。');scanRender();};box.appendChild(c);}$('scanNet').appendChild(box);
+}
+for(const c of Object.keys(colors)){const b=document.createElement('button');b.className='color-btn';b.dataset.color=c;b.style.background=colors[c];b.textContent=names[c];b.onclick=()=>{scan.brush=c;scanRender();};$('scanPalette').appendChild(b);}
+function scanPoint(e){const rect=scanCanvas.getBoundingClientRect();return {x:Math.max(0,Math.min(scanCanvas.width,(e.clientX-rect.left)*scanCanvas.width/rect.width)),y:Math.max(0,Math.min(scanCanvas.height,(e.clientY-rect.top)*scanCanvas.height/rect.height))};}
+scanCanvas.addEventListener('pointerdown',e=>{if(!scan.manual||!scan.image||scan.loading)return;const p=scanPoint(e);scan.drag={...p,toX:p.x,toY:p.y};scanCanvas.setPointerCapture(e.pointerId);});
+scanCanvas.addEventListener('pointermove',e=>{if(!scan.drag)return;const p=scanPoint(e);scan.drag.toX=p.x;scan.drag.toY=p.y;scanDraw();});
+scanCanvas.addEventListener('pointerup',e=>{
+  if(!scan.drag)return;const p=scanPoint(e),a=scan.drag;scan.drag=null;const r={x:Math.min(a.x,p.x),y:Math.min(a.y,p.y),w:Math.abs(p.x-a.x),h:Math.abs(p.y-a.y)};
+  if(r.w<18||r.h<18||r.w/r.h<.65||r.w/r.h>1.5){scanMessage('框选应接近正方形，并包含完整的 3×3 格子。请重新拖动。',true);scanDraw();return;}
+  scan.rects[scan.face]=r;scan.cells[scan.face]=NetRecognition.fromRect(scan.image,r);scanCheckMessage('已识别 '+scan.face+' 面。');scan.face=scanOrder.find(f=>!scan.cells[f])||scan.face;scanRender();scanDraw();
+});
+scanCanvas.addEventListener('pointercancel',()=>{scan.drag=null;scanDraw();});
+window.scanDiagnostics=()=>({cells:JSON.parse(JSON.stringify(scan.cells)),rects:JSON.parse(JSON.stringify(scan.rects)),manual:scan.manual,loading:scan.loading});
+$('solveBtn').onclick=solve;$('cancelBtn').onclick=()=>abort();$('screenshotBtn').onclick=scanOpen;$('exampleBtn').onclick=randomize;$('clearBtn').onclick=()=>load(core.encode(core.solved),'纯色布局');
+$('playBtn').onclick=play;$('nextBtn').onclick=()=>step(1);$('prevBtn').onclick=()=>step(-1);$('restartBtn').onclick=resetPlayback;$('copyBtn').onclick=copy;
+$('speed').oninput=()=>$('speedLabel').textContent=$('speed').value+' 毫秒';
+$('resetView').onclick=()=>{view={x:.38,y:-.58,zoom:1};draw();};$('randomView').onclick=()=>{view.y+=Math.PI/2;draw();};
+const scene=$('scene');scene.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y};scene.setPointerCapture(e.pointerId);});scene.addEventListener('pointermove',e=>{if(!drag)return;view.y=drag.vy+(e.clientX-drag.x)*.009;view.x=drag.vx+(e.clientY-drag.y)*.009;draw();});scene.addEventListener('pointerup',()=>drag=null);scene.addEventListener('pointercancel',()=>drag=null);scene.addEventListener('wheel',e=>{e.preventDefault();view.zoom=Math.max(.65,Math.min(1.6,view.zoom-e.deltaY*.001));draw();},{passive:false});
+new ResizeObserver(draw).observe(scene);
+window.addEventListener('beforeunload',()=>{if(worker)worker.terminate();});
+// 只读诊断接口供本地回归测试检查真正的页面状态，不替代按钮路径。
+window.cubeDiagnostics=()=>({input:faces.map(f=>input[f].join('')),display,position,solution:[...solution],snapshots:[...snapshots],solving,playing,animating});
+makeNet();load(core.encode(core.solved),'待录入：可上传展开图截图');
+})();
+</script>
+</body>
+</html>
